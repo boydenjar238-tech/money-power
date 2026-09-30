@@ -1,43 +1,40 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const app = express();
 const path = require('path');
 
-const app = express();
+app.use(express.static('public'));
+
+app.get('*', (req, res) => {
+    res.send(`
+    <!DOCTYPE html>
+    <html lang="hi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Money Power</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; background: #eef2f5; margin: 0; padding: 20px; }
+            .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+            .btn { display: block; background: #28a745; color: white; padding: 14px; border-radius: 6px; font-weight: bold; font-size: 16px; text-decoration: none; margin-top: 15px; }
+            .balance { font-size: 26px; color: #28a745; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <h2>⚡ Money Power ⚡</h2>
+        <div class="card">
+            <h3>Welcome User!</h3>
+            <p>Wallet Balance:</p>
+            <div class="balance">₹<span id="bal">50</span></div>
+        </div>
+        <div class="card" style="margin-top: 15px;">
+            <h3>Daily Tasks & Ads</h3>
+            <p>Task complete karke ₹10 kamaein</p>
+            <a href="https://thoroughgear.com/9O07aE" target="_blank" class="btn" onclick="document.getElementById('bal').innerText = parseInt(document.getElementById('bal').innerText) + 10;">Complete Task & Claim ₹10</a>
+        </div>
+    </body>
+    </html>
+    `);
+});
+
 const PORT = process.env.PORT || 3000;
-
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-const usersDB = {};
-
-app.post('/api/register', (req, res) => {
-    const { username, password, upiId } = req.body;
-    if (usersDB[username]) return res.status(400).json({ success: false, message: "User pehle se hai!" });
-    usersDB[username] = { password, upiId, balance: 20 };
-    res.json({ success: true, message: "Account Ban Gaya! Ab Login Karein." });
-});
-
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-    const user = usersDB[username];
-    if (!user || user.password !== password) return res.status(400).json({ success: false, message: "Galat Credentials!" });
-    res.json({ success: true, message: "Login Success!", username, balance: user.balance });
-});
-
-app.post('/api/complete-task', (req, res) => {
-    const { username } = req.body;
-    if (!usersDB[username]) return res.status(400).json({ success: false, message: "User invalid" });
-    usersDB[username].balance += 10;
-    res.json({ success: true, newBalance: usersDB[username].balance, message: "Task complete! ₹10 jude." });
-});
-
-app.post('/api/withdraw', (req, res) => {
-    const { username, amount } = req.body;
-    if (!usersDB[username] || usersDB[username].balance < amount) {
-        return res.status(400).json({ success: false, message: "Insufficient balance" });
-    }
-    usersDB[username].balance -= amount;
-    res.json({ success: true, newBalance: usersDB[username].balance, message: `₹${amount} withdrawal request submit ho gayi!` });
-});
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log('Server running on port ' + PORT));
