@@ -1,15 +1,19 @@
 const express = require('express');
 const app = express();
 
-app.get('*', (req, res) => {
+app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+});
+
+app.get('*', (req, res) => {
     res.send(`
     <!DOCTYPE html>
     <html lang="hi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Money Power - Earn Real Money</title>
+        <title>Money Power - Full Version</title>
         <style>
             body { font-family: Arial, sans-serif; text-align: center; background: #eef2f5; margin: 0; padding: 20px; }
             .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; margin-bottom: 15px; }
@@ -22,7 +26,7 @@ app.get('*', (req, res) => {
     </head>
     <body>
 
-        <h2>⚡ Money Power ⚡</h2>
+        <h2>⚡ Money Power v2.0 ⚡</h2>
 
         <!-- LOGIN / REGISTER SECTION -->
         <div id="authBox" class="card">
@@ -42,7 +46,7 @@ app.get('*', (req, res) => {
             <div class="card">
                 <h3>Welcome, <span id="userDisp">User</span>!</h3>
                 <p>Wallet Balance:</p>
-                <div class="balance">₹<span id="bal">0</span></div>
+                <div class="balance">₹<span id="bal">100</span></div>
             </div>
 
             <!-- TASK SECTION -->
