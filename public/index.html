@@ -68,10 +68,7 @@
 
     <script>
         function openAdTask(adUrl) {
-            // Ad Link naye tab me open hoga
             window.open(adUrl, '_blank');
-            
-            // User ko reward point dene ka function call
             if (typeof completeTask === "function") {
                 completeTask();
             }
