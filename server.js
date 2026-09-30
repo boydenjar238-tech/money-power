@@ -6,14 +6,15 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('*', (req, res) => {
+// Fixed route syntax (bina wildcard error ke)
+app.use((req, res) => {
     res.send(`
     <!DOCTYPE html>
     <html lang="hi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Money Power - Full Version</title>
+        <title>Money Power - Real Earning</title>
         <style>
             body { font-family: Arial, sans-serif; text-align: center; background: #eef2f5; margin: 0; padding: 20px; }
             .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; margin-bottom: 15px; }
@@ -26,7 +27,7 @@ app.get('*', (req, res) => {
     </head>
     <body>
 
-        <h2>⚡ Money Power v2.0 ⚡</h2>
+        <h2>⚡ Money Power ⚡</h2>
 
         <!-- LOGIN / REGISTER SECTION -->
         <div id="authBox" class="card">
