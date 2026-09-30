@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Power - Earn Real Money Online</title>
+    <meta name="description" content="Money Power app par daily tasks complete karein aur real money kamaein.">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #eef2f5; margin: 0; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 380px; margin: 0 auto 15px; }
+        input { width: 90%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; width: 100%; font-weight: bold; }
+        .btn-withdraw { background: #007bff; margin-top: 8px; }
+        .hidden { display: none; }
+        .balance { font-size: 26px; color: #28a745; font-weight: bold; }
+        .ad-box { background: #fff3cd; border: 1px dashed #ffebaba; padding: 10px; margin: 10px 0; border-radius: 6px; font-size: 12px; color: #856404; }
+    </style>
+</head>
+<body>
+
+    <h2>⚡ Money Power ⚡</h2>
+
+    <!-- LOGIN & REGISTER -->
+    <div id="authBox" class="card">
+        <h3 id="formTitle">User Login</h3>
+        <input type="text" id="username" placeholder="Phone Number / Username">
+        <input type="password" id="password" placeholder="Password">
+        <input type="text" id="upiId" placeholder="UPI ID" class="hidden">
+        
+        <button id="authBtn" onclick="handleAuth()">Login Karein</button>
+        <p style="cursor:pointer; color:#007bff; font-size:14px;" onclick="toggleAuthMode()">
+            <span id="toggleText">Naya Account Banayein (Register)</span>
+        </p>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboard" class="hidden">
+        <div class="card">
+            <h3>Welcome, <span id="userDisp"></span>!</h3>
+            <p>Wallet Balance:</p>
+            <div class="balance">₹<span id="balance">0</span></div>
+        </div>
+
+        <!-- Ad Monetag Space -->
+        <div class="ad-box">
+            <p>[ ADVERTISEMENT PLACEHOLDER ]</p>
+        </div>
+
+        <div class="card">
+            <h3>Daily Tasks & Ads</h3>
+            <p>Task complete karke ₹10 kamaein</p>
+            <button onclick="doTask()">Complete Task & Claim ₹10</button>
+        </div>
+
+        <div class="card">
+            <h3>Instant Withdrawal</h3>
+            <input type="number" id="withdrawAmt" placeholder="Amount (Min ₹10)">
+            <button class="btn-withdraw" onclick="withdrawMoney()">Instant Redeem</button>
+        </div>
+
+        <button style="background:#dc3545; max-width:380px;" onclick="location.reload()">Logout</button>
+    </div>
+
+    <script>
+        let isRegisterMode = false;
+        let currentUser = null;
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('formTitle').innerText = isRegisterMode ? 'New User Registration' : 'User Login';
+            document.getElementById('authBtn').innerText = isRegisterMode ? 'Register Karein' : 'Login Karein';
+            document.getElementById('upiId').classList.toggle('hidden', !isRegisterMode);
+            document.getElementById('toggleText').innerText = isRegisterMode ? 'Pehle Se Account Hai? Login' : 'Naya Account Banayein (Register)';
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const upiId = document.getElementById('upiId').value;
+
+            if (!username || !password) return alert("Details poori bharein!");
+
+            const endpoint = isRegisterMode ? '/api/register' : '/api/login';
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, upiId })
+                });
+                const data = await res.json();
+                alert(data.message);
+
+                if (data.success) {
+                    if (isRegisterMode) {
+                        toggleAuthMode();
+                    } else {
+                        currentUser = data.username;
+                        document.getElementById('userDisp').innerText = currentUser;
+                        document.getElementById('balance').innerText = data.balance;
+                        document.getElementById('authBox').classList.add('hidden');
+                        document.getElementById('dashboard').classList.remove('hidden');
+                    }
+                }
+            } catch (err) {
+                alert("Server Error! Check karein ki Node server chal raha hai ya nahi.");
+            }
+        }
+
+        async function doTask() {
+            const res = await fetch('/api/complete-task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUser })
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) document.getElementById('balance').innerText = data.newBalance;
+        }
+
+        async function withdrawMoney() {
+            const amount = document.getElementById('withdrawAmt').value;
+            if(!amount || amount < 10) return alert("Min ₹10 withdrawal hai!");
+            
+            const res = await fetch('/api/withdraw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUser, amount: Number(amount) })
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) document.getElementById('balance').innerText = data.newBalance;
+        }
+    </script>
+</body>
+</html>
